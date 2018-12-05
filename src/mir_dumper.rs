@@ -6,7 +6,7 @@ use log::trace;
 use rustc_driver::driver;
 use rustc::hir::{self, intravisit};
 use rustc::mir;
-use rustc::ty::TyCtxt;
+use rustc::ty::{self, TyCtxt};
 use syntax::ast;
 use syntax_pos::Span;
 use std::cell;
@@ -213,7 +213,30 @@ impl<'a, 'tcx> MirInfoPrinter<'a, 'tcx> {
         }
         let terminator = terminator.clone();
         let term_str = if let Some(ref term) = &terminator {
-            to_html!(term.kind)
+            let kind_str = to_html!(term.kind);
+            match term.kind {
+                mir::TerminatorKind::Call {
+                    func: mir::Operand::Constant(
+                        box mir::Constant {
+                            literal: ty::Const {
+                                ty: ty::TyS {
+                                    sty: ty::TyKind::FnDef (def_id, substs),
+                                    ..
+                                },
+                                ..
+                            },
+                            ..
+                        }
+                    ),
+                    ..
+                } => {
+                    // Get the unique identifier of the defintion:
+                    //let def_path = self.tcx.def_path(*def_id);
+                    let def_path = self.tcx.def_path_debug_str(*def_id);
+                    format!("{}<br />{}<br />{}", kind_str, to_html!(def_path), to_html!(substs))
+                }
+                _ => kind_str,
+            }
         } else {
             String::from("")
         };
