@@ -1,10 +1,3 @@
-Set up rustc:
-
-```bash
-rustup update nightly-2018-12-02
-rustup default nightly-2018-12-02
-```
-
 Build:
 ```bash
 cargo build
