@@ -111,7 +111,7 @@ fn add_fake_facts<'a, 'tcx:'a>(
 impl PoloniusInfo {
     pub fn new<'a, 'tcx: 'a>(tcx: ty::TyCtxt<'a, 'tcx, 'tcx>, def_id: DefId, mir: &'a mir::Mir<'tcx>) -> Self {
         // Read Polonius facts.
-        let def_path = tcx.hir.def_path(def_id);
+        let def_path = tcx.hir().def_path(def_id);
         let dir_path = PathBuf::from("nll-facts").join(def_path.to_filename_friendly_no_crate());
         debug!("Reading facts from: {:?}", dir_path);
         let mut facts_loader = facts::FactLoader::new();

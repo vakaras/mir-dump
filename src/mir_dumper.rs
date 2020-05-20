@@ -30,7 +30,7 @@ pub fn dump_info<'r, 'a: 'r, 'tcx: 'a>(state: &'r mut driver::CompileState<'a, '
     let mut printer = InfoPrinter {
         tcx: tcx,
     };
-    intravisit::walk_crate(&mut printer, tcx.hir.krate());
+    intravisit::walk_crate(&mut printer, tcx.hir().krate());
 
     trace!("[dump_info] exit");
 }
@@ -41,7 +41,7 @@ struct InfoPrinter<'a, 'tcx: 'a> {
 
 impl<'a, 'tcx> intravisit::Visitor<'tcx> for InfoPrinter<'a, 'tcx> {
     fn nested_visit_map<'this>(&'this mut self) -> intravisit::NestedVisitorMap<'this, 'tcx> {
-        let map = &self.tcx.hir;
+        let map = self.tcx.hir();
         intravisit::NestedVisitorMap::All(map)
     }
 
@@ -67,11 +67,11 @@ impl<'a, 'tcx> intravisit::Visitor<'tcx> for InfoPrinter<'a, 'tcx> {
             _ => {},
         };
 
-        let def_id = self.tcx.hir.local_def_id(node_id);
+        let def_id = self.tcx.hir().local_def_id(node_id);
         self.tcx.mir_borrowck(def_id);
 
         // Read Polonius facts.
-        let def_path = self.tcx.hir.def_path(def_id);
+        let def_path = self.tcx.hir().def_path(def_id);
 
         let mir = self.tcx.mir_validated(def_id).borrow();
 
